@@ -1,0 +1,25 @@
+require('dotenv').config()
+
+const PORT = process.env.PORT || 3000
+
+const MONGODB_URI = process.env.MONGODB_URI
+
+const EXERCISEDB_KEY = process.env.EXERCISEDB_API_KEY
+
+const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME
+
+const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY
+
+const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET
+
+const JWT_SECRET = process.env.JWT_SECRET
+
+module.exports = {
+  MONGODB_URI,
+  PORT,
+  EXERCISEDB_KEY,
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET,
+  JWT_SECRET,
+}

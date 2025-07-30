@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const bcryptjs = require('bcryptjs')
+const { setFlagsFromString } = require('v8')
 
 const userSchema = mongoose.Schema({
   username: {
@@ -18,7 +19,51 @@ const userSchema = mongoose.Schema({
     type: String,
     default: ""
   },
-}, {timestamps: true}
+  privacy: {
+    type: String,
+    enum: ['private', 'public'], 
+    default: "public"
+  },
+  followers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  }], 
+  following: [{
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User",
+  }],
+  pendingFollowRequests: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  }],
+  followRequestsReceived: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }],
+  followerCount: {
+    type: Number,
+    default: 0
+  },
+  followingCount: {
+    type: Number,
+    default: 0
+  },
+  pendingRequestCount: {
+    type: Number,
+    default: 0
+  },
+  receivedRequestCount: {
+    type: Number,
+    default: 0
+  },
+  createdAt: {
+    type: Date,
+  },
+  updatedAt: {
+    type: Date,
+    default: this.createdAt
+  }
+}
 )
 
 userSchema.set('toJSON', {

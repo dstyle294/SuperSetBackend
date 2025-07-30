@@ -4,7 +4,8 @@ const cors = require('cors')
 const authRouter = require('./routes/authRouter')
 const workoutRouter = require('./routes/workoutRouter')
 const exerciseRouter = require('./routes/exerciseRouter')
-
+const postRouter = require('./routes/postRouter')
+const userRouter = require('./routes/userRouter')
 
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
@@ -28,7 +29,8 @@ app.use(middleware.requestLogger)
 app.use("/api/auth", authRouter)
 app.use("/api/workouts", workoutRouter)
 app.use("/api/exercises", exerciseRouter)
-
+app.use("/api/posts", postRouter)
+app.use("/api/users", userRouter)
 
 
 app.use(middleware.unknownEndpoint)

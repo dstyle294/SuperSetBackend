@@ -1,5 +1,5 @@
-import cron from "cron";
-import https from "https";
+const cron = require('cron')
+const https = require('https')
 
 const job = new cron.CronJob("*/14 * * * *", function () {
   https
@@ -10,7 +10,7 @@ const job = new cron.CronJob("*/14 * * * *", function () {
     .on("error", (e) => console.error("Error while sending request", e));
 });
 
-export default job;
+module.exports = job
 
 // CRON JOB EXPLANATION:
 // Cron jobs are scheduled tasks that run periodically at fixed intervals

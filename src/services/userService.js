@@ -33,9 +33,11 @@ const autoAcceptPendingRequests = async (userId) => {
 }
 
 const isViewable = async (currentUserId, targetUserId) => {
+  const stringCurrId = currentUserId.toString()
+  const stringTargetId = targetUserId.toString()
+  if (stringCurrId === stringTargetId) return true;
   const result = await User.findOne({
     $or: [
-      { currentUserId: {$eq: targetUserId } },
       {_id: targetUserId, privacy: 'public'},
       {
         _id: currentUserId,

@@ -147,7 +147,7 @@ router.get("/comments", middleware.protectRoute, async (request, response) => {
   try {
     const userId = request.user._id
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const comments = await Comment.find(
@@ -184,7 +184,7 @@ router.get("/workouts", middleware.protectRoute, async (request, response) => {
   try {
     const userId = request.user._id.toString()
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const workouts = await Workout.find(
@@ -556,7 +556,7 @@ router.get("/followRequest/sent", middleware.protectRoute, async (request, respo
   try {
     const userId = request.user._id
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const user = await User.findById(userId)
@@ -585,7 +585,7 @@ router.get("/followRequest/received", middleware.protectRoute, async (request, r
   try {
     const userId = request.user._id
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const user = await User.findById(userId)
@@ -613,7 +613,7 @@ router.get("/followers", middleware.protectRoute, async (request, response) => {
   try {
     const userId = request.user._id
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const user = await User.findById(userId)
@@ -642,7 +642,7 @@ router.get("/following", middleware.protectRoute, async (request, response) => {
   try {
     const userId = request.user._id
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const user = await User.findById(userId)

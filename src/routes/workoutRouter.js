@@ -145,7 +145,7 @@ router.post("/start", middleware.protectRoute, async (request, response) => {
 })
 
 // update workout
-router.put("/:workoutId", middleware.protectRoute, async (request, response) => {
+router.patch("/:workoutId", middleware.protectRoute, async (request, response) => {
   try {
     const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
     const userId = request.user._id.toString()
@@ -193,7 +193,7 @@ router.put("/:workoutId", middleware.protectRoute, async (request, response) => 
 })
 
 // end workout
-router.put("/end/:workoutId", middleware.protectRoute, async (request, response) => {
+router.patch("/end/:workoutId", middleware.protectRoute, async (request, response) => {
   try {
     const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
     const userId = request.user._id.toString()
@@ -234,7 +234,7 @@ router.put("/end/:workoutId", middleware.protectRoute, async (request, response)
 })
 
 // pause workout
-router.put("/pause/:workoutId", middleware.protectRoute, async (request, response) => {
+router.patch("/pause/:workoutId", middleware.protectRoute, async (request, response) => {
   try {
     const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
     const userId = request.user._id.toString()
@@ -279,7 +279,7 @@ router.put("/pause/:workoutId", middleware.protectRoute, async (request, respons
 })
 
 // resume workout
-router.put("/resume/:workoutId", middleware.protectRoute, async (request, response) => {
+router.patch("/resume/:workoutId", middleware.protectRoute, async (request, response) => {
   try {
     const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
     const userId = request.user._id.toString()
@@ -453,15 +453,19 @@ router.post('/:workoutId/exercises/copy', middleware.protectRoute, async (reques
     }
 
     let currentOrder = targetWorkout.exercises.length + 1 
+
     const copiedExercises = sourceWorkout.exercises.map((exercise, index) => ({
       api_exercise_id: exercise.api_exercise_id,
       name: exercise.name,
       order: currentOrder + index,
-      sets: exercise.sets,
-      reps: exercise.reps,
-      weight: exercise.weight,
-      duration: exercise.duration,
-      rest_time: exercise.rest_time,
+      sets: exercise.sets.map(set => ({
+        set_number: set.set_number,
+        reps: set.reps,
+        weight: set.weight,
+        completed: false,
+        rest_time: set.rest_time,
+        notes: undefined,
+      })),
       notes: exercise.notes,
       added_at: new Date()
     }))
@@ -472,7 +476,7 @@ router.post('/:workoutId/exercises/copy', middleware.protectRoute, async (reques
 
     await targetWorkout.save()
 
-    sourceWorkout.copied_from = true
+    sourceWorkout.copied_from = request.params.workoutId
 
     await sourceWorkout.save()
 
@@ -489,8 +493,7 @@ router.post('/:workoutId/exercises/copy', middleware.protectRoute, async (reques
 })
 
 // Adding exercise
-router.post("/:workoutId/", middleware.protectRoute, async (request, response) => {
-  
+router.post("/:workoutId/exercises", middleware.protectRoute, async (request, response) => {
 
   try {
     const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
@@ -499,9 +502,6 @@ router.post("/:workoutId/", middleware.protectRoute, async (request, response) =
       api_exercise_id,
       name,
       sets,
-      reps, 
-      weight, 
-      rest_time,
       notes,
       position,
     } = request.body
@@ -533,10 +533,7 @@ router.post("/:workoutId/", middleware.protectRoute, async (request, response) =
     const newExercise = {
       api_exercise_id,
       name: name || exerciseExists.data.name,
-      sets: sets || 1,
-      reps: reps || null,
-      weight: weight || null,
-      rest_time: rest_time || 120,
+      sets: sets || [],
       notes: notes || '',
       updated_at: new Date(),
       order: exercisePosition,
@@ -572,7 +569,7 @@ router.post("/:workoutId/", middleware.protectRoute, async (request, response) =
 })
 
 // Updating exercise
-router.put("/:workoutId/exercises/:exerciseId", middleware.protectRoute, async (request, response) => {
+router.patch("/:workoutId/exercises/:exerciseId", middleware.protectRoute, async (request, response) => {
   try {
     const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
     const userId = request.user._id.toString()
@@ -599,7 +596,7 @@ router.put("/:workoutId/exercises/:exerciseId", middleware.protectRoute, async (
       return response.status(404).json({ message: "Exercise not found in workout"})
     }
 
-    const allowedFields = ['sets', 'reps', 'weight', 'duration', 'rest_time', 'notes', 'order']
+    const allowedFields = ['sets', 'notes', 'order']
     allowedFields.forEach(field => {
       if (updateData[field] !== undefined) {
         thisWorkout.exercises[exerciseIndex][field] = updateData[field]
@@ -622,8 +619,123 @@ router.put("/:workoutId/exercises/:exerciseId", middleware.protectRoute, async (
   }
 })
 
+// Update set
+router.patch("/:workoutId/exercises/:exerciseId/sets/:setId", middleware.protectRoute, async (request, response) => {
+  try {
+    const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
+    const userId = request.user._id.toString()
+    const exerciseId = request.params.exerciseId.toString() // this is not api exercise id but the exercise instance id
+
+    const updateData = request.body
+  } catch (error) {
+    
+  }
+})
+
+// Add set(s)
+router.post("/:workoutId/exercises/:exerciseId/sets", middleware.protectRoute, async (request, response) => {
+  try {
+    const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
+    const userId = request.user._id.toString()
+    const exerciseId = request.params.exerciseId.toString() // this is not api exercise id but the exercise instance id
+
+    const sets = request.body.sets
+
+    const thisWorkout = await Workout.findOne({
+      $and: [
+        {_id: {$eq: workoutId}},
+        {user: {$eq: userId}}
+      ]
+    })
+
+    if (!thisWorkout) {
+      return response.status(404).json({ message: "Workout not found" })
+    }
+
+    const exerciseIndex = thisWorkout.exercises.findIndex(
+      exercise => exercise._id.toString() === exerciseId
+    )
+
+    if (exerciseIndex === -1) {
+      return response.status(404).json({ message: "Exercise not found in workout"})
+    }
+
+    let numberOfSets = thisWorkout.exercises[exerciseIndex].sets.length
+    
+
+    sets.map(set => {
+      set.set_number = numberOfSets++
+      thisWorkout.exercises[exerciseIndex].sets.push(set)
+    })
+
+    thisWorkout.exercises[exerciseIndex].updated_at = new Date()
+    await thisWorkout.save()
+
+    response.status(201).json({
+      message: 'Exercise set added', 
+      exercise: thisWorkout.exercises[exerciseIndex],
+      workout: thisWorkout,
+    })
+
+  } catch (error) {
+    logger.error(`Error adding exercise ${error}`)
+    response.status(500).json({ message: 'Failed to add exercise' })
+  }
+})
+
+// Delete set
+router.delete("/:workoutId/exercises/:exerciseId/sets/:setId", middleware.protectRoute, async (request, response) => {
+  try {
+    const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
+    const userId = request.user._id.toString()
+    const exerciseId = request.params.exerciseId.toString() // this is not api exercise id but the exercise instance id
+    const setId = request.params.setId
+
+    const thisWorkout = await Workout.findOne({
+      $and: [
+        {_id: {$eq: workoutId}},
+        {user: {$eq: userId}}
+      ]
+    })
+
+    if (!thisWorkout) {
+      return response.status(404).json({ message: "Workout not found" })
+    }
+
+    const exerciseIndex = thisWorkout.exercises.findIndex(
+      exercise => exercise._id.toString() === exerciseId
+    )
+
+    if (exerciseIndex === -1) {
+      return response.status(404).json({ message: "Exercise not found in workout"})
+    }
+
+    const setIndex = thisWorkout.exercises[exerciseIndex].sets.findIndex(set => set._id.toString() === setId)
+
+    if (setIndex === -1) {
+      return response.status(404).json({ message: "Set not found in workout" })
+    }
+
+    
+
+
+    thisWorkout.exercises[exerciseIndex].updated_at = new Date()
+    thisWorkout.updated_at = new Date()
+    await thisWorkout.save()
+
+    response.status(200).json({
+      message: 'Set deleted successfully',
+      workout: thisWorkout,
+    })
+
+  } catch (error) {
+    logger.error(`Error deleting set ${error}`)
+    response.status(500).json({ message: 'Failed to delete set' })
+  }
+})
+
 // delete exercise
-router.delete("/:workoutId/:exerciseId", middleware.protectRoute, async (request, response) => {
+router.delete("/:workoutId/exercises/:exerciseId", middleware.protectRoute, async (request, response) => {
   try {
     const userId = request.user._id.toString()
     const workout = await Workout.findById(request.params.workoutId)

@@ -109,9 +109,9 @@ router.get("/target/:target", async (request, response) => {
 router.get("/name/:name", async (request, response) => {
   try {
     const name = request.params.name
-    const exercise = await exerciseService.getExercisesByName(name)
+    const exercises = await exerciseService.getExercisesByName(name)
     response.status(200).json({
-      exercise,
+      exercises,
     })
   } catch (error) {
     response.status(404).json({ message: 'Exercise not found by name' })

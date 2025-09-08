@@ -7,9 +7,13 @@ const logger = require('../utils/logger')
 // general
 router.get("/", async (request, response) => {
   try {
-    const exercises = await exerciseService.getAllExercises()
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 10
+    const skip = page - 1 * limit
+
+    const exercises = await exerciseService.getAllExercises(page, limit, skip)
     response.status(200).json({
-        exercises,
+      exercises,
     })
   } catch (error) {
     logger.error(`Error in retrieving exercises`)
@@ -22,6 +26,11 @@ router.get("/id/:id", async (request, response) => {
   try {
     const id = request.params.id
     const exercise = await exerciseService.getExerciseById(id)
+
+    if (!exercise.data) { 
+      throw new Error()
+    }
+
     response.status(200).json({
       exercise,
     })
@@ -31,9 +40,18 @@ router.get("/id/:id", async (request, response) => {
 })
 
 // body part list
-router.get("/bodyPartList", async (request, response) => {
+router.get("/bodyPart/", async (request, response) => {
   try {
-    const bodyParts = await exerciseService.getBodyPartList()
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 10
+    const skip = (page - 1) * limit
+
+    const bodyParts = await exerciseService.getBodyPartList(page, limit, skip)
+
+    if (!bodyParts.data) {
+      throw new Error()
+    }
+
     response.status(200).json({
       bodyParts,
     })
@@ -42,11 +60,15 @@ router.get("/bodyPartList", async (request, response) => {
   }
 })
 
-// by body part
+// exercises by body part
 router.get("/bodyPart/:bodyPart", async (request, response) => {
   try {
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 10
+    const skip = (page - 1) * limit
+
     const bodyPart = request.params.bodyPart
-    const exercises = await exerciseService.getExerciseByBodyPart(bodyPart)
+    const exercises = await exerciseService.getExercisesByBodyPart(bodyPart, page, limit, skip)
     response.status(200).json({
       exercises,
     })
@@ -56,9 +78,13 @@ router.get("/bodyPart/:bodyPart", async (request, response) => {
 })
 
 // equipment list
-router.get("/equipmentList", async (request, response) => {
+router.get("/equipment", async (request, response) => {
   try {
-    const equipments = await exerciseService.getEquipmentList()
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 10
+    const skip = (page - 1) * limit
+
+    const equipments = await exerciseService.getEquipmentList(page, limit, skip)
     response.status(200).json({
       equipments,
     })
@@ -67,11 +93,15 @@ router.get("/equipmentList", async (request, response) => {
   }
 })
 
-// by equipment
+// exercises by equipment
 router.get("/equipment/:equipment", async (request, response) => {
   try {
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 10
+    const skip = (page - 1) * limit
+
     const equipment = request.params.equipment
-    const exercises = await exerciseService.getExerciseByEquipment(equipment)
+    const exercises = await exerciseService.getExerciseByEquipment(equipment, page, limit, skip)
     response.status(200).json({
       exercises,
     })
@@ -80,10 +110,30 @@ router.get("/equipment/:equipment", async (request, response) => {
   }
 })
 
-// target list
-router.get("/targetList", async (request, response) => {
+// muscle list
+router.get("/muscle", async (request, response) => {
   try {
-    const targets = await exerciseService.getTargetList()
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 10
+    const skip = (page - 1) * limit
+
+    const muscles = await exerciseService.getMuscleList(page, limit, skip)
+    response.status(200).json({
+      muscles,
+    })
+  } catch (error) {
+    response.status(404).json({ message: 'Targets not found' })
+  }
+})
+
+// target list
+router.get("/target", async (request, response) => {
+  try {
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 10
+    const skip = (page - 1) * limit
+
+    const targets = await exerciseService.getTargetList(page, limit, skip)
     response.status(200).json({
       targets,
     })
@@ -92,11 +142,15 @@ router.get("/targetList", async (request, response) => {
   }
 })
 
-// by target
+// exercises by target
 router.get("/target/:target", async (request, response) => {
   try {
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 10
+    const skip = (page - 1) * limit
+
     const target = request.params.target
-    const exercises = await exerciseService.getExerciseByTarget(target)
+    const exercises = await exerciseService.getExerciseByTarget(target, page, limit, skip)
     response.status(200).json({
       exercises,
     })
@@ -106,10 +160,14 @@ router.get("/target/:target", async (request, response) => {
 })
 
 // by name
-router.get("/name/:name", async (request, response) => {
-  try {
+router.get(`/name/:name`, async (request, response) => {
+  try { 
     const name = request.params.name
-    const exercises = await exerciseService.getExercisesByName(name)
+    const page = parseInt(request.query.page) || 1
+    const limit = parseInt(request.query.limit) || 10
+    const skip = (page - 1) * limit
+
+    const exercises = await exerciseService.getExercisesByName(name, page, limit, skip)
     response.status(200).json({
       exercises,
     })
@@ -117,8 +175,5 @@ router.get("/name/:name", async (request, response) => {
     response.status(404).json({ message: 'Exercise not found by name' })
   }
 })
-
-
-
 
 module.exports = router

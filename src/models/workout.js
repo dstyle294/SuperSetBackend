@@ -9,7 +9,7 @@ const workoutSchema = mongoose.Schema({
       { set_number: Number, reps: Number, weight: Number, completed: { type: Boolean, default: false }, notes: String }
     ],
     notes: String,
-    added_at: {type: Date, default: null},
+    updated_at: {type: Date, default: null},
   }],
   is_public: {type: Boolean, default: true},
   allow_copying: {type: Boolean, default: true},

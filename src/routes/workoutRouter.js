@@ -716,11 +716,11 @@ router.post("/:workoutId/exercises/:exerciseId/sets", middleware.protectRoute, a
       return response.status(404).json({ message: "Exercise not found in workout"})
     }
 
-    let numberOfSets = thisWorkout.exercises[exerciseIndex].sets.length
+    let numberOfSets = thisWorkout.exercises[exerciseIndex].sets.length + 1
     
 
     sets.map(set => {
-      set.set_number = numberOfSets++
+      set.set_number = numberOfSets
       thisWorkout.exercises[exerciseIndex].sets.push(set)
     })
 

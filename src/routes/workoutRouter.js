@@ -734,8 +734,8 @@ router.post("/:workoutId/exercises/:exerciseId/sets", middleware.protectRoute, a
     })
 
   } catch (error) {
-    logger.error(`Error adding exercise ${error}`)
-    response.status(500).json({ message: 'Failed to add exercise' })
+    logger.error(`Error adding set ${error}`)
+    response.status(500).json({ message: 'Failed to add set' })
   }
 })
 

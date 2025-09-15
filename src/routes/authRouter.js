@@ -55,7 +55,8 @@ router.post("/register", async (request, response) => {
     const passwordHash = await bcrypt.hash(password, saltRounds)
 
     // get a random avatar
-    const profileImage = `https:api.dicebear.com/7.x/avataars/svg?seed=${username}`
+    const uploadResponse = await cloudinary.uploader.upload(`https:api.dicebear.com/7.x/avataars/svg?seed=${username}`)
+    const profileImage = uploadResponse.secure_url
 
     const user = new User({
       username,

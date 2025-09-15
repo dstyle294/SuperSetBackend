@@ -348,7 +348,7 @@ router.get("/", middleware.protectRoute, async (request, response) => {
   try {
     const userId = request.user._id.toString()
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const workouts = await Workout.find(

@@ -27,7 +27,7 @@ router.post("/", middleware.protectRoute, async (request, response) => {
     }
 
     if (!workout) {
-      return response.status(400).json({ message: 'Workout required' })
+      return response.status(400).json({ message: 'Workout required'})
     }
 
     const created_at = new Date()
@@ -101,19 +101,22 @@ router.get("/", middleware.protectRoute, async (request, response) => {
 
     const userId = request.user._id
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
-    logger.info(userId)
 
     let posts = await getFilteredPosts(userId, skip, limit)
 
-    const totalPosts = await posts.length
+    const totalPosts = posts.length
+
+
+    console.log(skip, skip + limit)
 
     posts = posts
       .sort((p1, p2) => p2.created_at - p1.created_at)
       .slice(skip, skip + limit)
 
+    
 
     if (!posts) {
       return response.status(404).json({ message: 'No posts exist under this user' })
@@ -138,7 +141,7 @@ router.get("/user", middleware.protectRoute, async (request, response) => {
   try {
     const userId = request.user._id.toString()
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const posts = await Post.find(
@@ -176,7 +179,7 @@ router.get("/user/:userId", middleware.protectRoute, async (request, response) =
     const userId = request.user._id
     const targetUserId = mongoose.Types.ObjectId.createFromHexString(request.params.userId)
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
 
@@ -502,7 +505,7 @@ router.get("/:postId/comment", middleware.protectRoute, async (request, response
     const userId = request.user._id
     const postId = request.params.postId
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const post = await Post.findById(postId)
@@ -596,7 +599,7 @@ router.get("/:userId/comments", middleware.protectRoute, async (request, respons
     const currentUserId = request.user._id
     const userId = mongoose.Types.ObjectId.createFromHexString(request.params.userId)
     const page = request.query.page || 1
-    const limit = request.query.limit || 5
+    const limit = parseInt(request.query.limit) || 5
     const skip = (page - 1) * limit
 
     const comments = await Comment.find({

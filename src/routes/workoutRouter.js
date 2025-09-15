@@ -53,7 +53,7 @@ const updateMusclesEquip = async (workout) => {
 
     equipment.forEach(equip => {
       if (!exerciseSameEquipment(equip)) {
-        workout.equipment.push({equipment: equip})
+        workout.equipment_needed.push({equipment: equip})
       }
     })
 

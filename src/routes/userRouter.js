@@ -29,7 +29,7 @@ router.get("/", middleware.protectRoute, async (request, response) => {
 })
 
 // User profile
-router.get("/:userId", middleware.protectRoute, async (request, response) => {
+router.get("/user/:userId", middleware.protectRoute, async (request, response) => {
   try {
     const currentUserId = request.user._id
 

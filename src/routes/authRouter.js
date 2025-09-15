@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const logger = require('../utils/logger')
 const config = require('../utils/config')
+const cloudinary = require('cloudinary')
 
 
 const User = require('../models/user')

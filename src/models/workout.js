@@ -5,10 +5,9 @@ const workoutSchema = mongoose.Schema({
     api_exercise_id: String,
     name: String,
     order: Number,
-    sets: Number,
-    reps: Number,
-    weight: Number,
-    rest_time: Number,
+    sets: [
+      { set_number: Number, reps: Number, weight: Number, completed: { type: Boolean, default: false }, notes: String }
+    ],
     notes: String,
     added_at: {type: Date, default: null},
   }],

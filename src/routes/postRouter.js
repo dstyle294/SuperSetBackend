@@ -26,6 +26,10 @@ router.post("/", middleware.protectRoute, async (request, response) => {
       return response.status(400).json({ message: 'Caption required' })
     }
 
+    if (!workout) {
+      return response.status(400).json({ message: 'Workout required' })
+    }
+
     const created_at = new Date()
 
     const newPost = new Post({

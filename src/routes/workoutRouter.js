@@ -17,7 +17,7 @@ const updateMusclesEquip = async (workout) => {
   logger.info(workout + "before")
 
   for (const exercise of workout.exercises) {
-    const exerciseExists = await exerciseService.getExerciseById(exercise.api_exercise_id)
+    const exerciseExists = await exerciseService.getExerciseById(exercise.exerciseId)
 
     // logger.info(exerciseExists)
 
@@ -455,7 +455,7 @@ router.post('/:workoutId/exercises/copy', middleware.protectRoute, async (reques
     let currentOrder = targetWorkout.exercises.length + 1 
 
     const copiedExercises = sourceWorkout.exercises.map((exercise, index) => ({
-      api_exercise_id: exercise.api_exercise_id,
+      exerciseId: exercise.exerciseId,
       name: exercise.name,
       order: currentOrder + index,
       sets: exercise.sets.map(set => ({
@@ -499,7 +499,7 @@ router.post("/:workoutId/exercises", middleware.protectRoute, async (request, re
     const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
     const userId = request.user._id.toString()
     const {
-      api_exercise_id,
+      exerciseId,
       name,
       sets,
       notes,
@@ -521,7 +521,7 @@ router.post("/:workoutId/exercises", middleware.protectRoute, async (request, re
       return response.status(400).json({ message: 'Cannot added exercises to a completed workout' })
     }
 
-    const exerciseExists = await exerciseService.getExerciseById(api_exercise_id)
+    const exerciseExists = await exerciseService.getExerciseById(exerciseId)
 
     if (exerciseExists.status !== 200) {
       response.status(400).json({ message: 'Invalid exercise ID' })
@@ -531,7 +531,7 @@ router.post("/:workoutId/exercises", middleware.protectRoute, async (request, re
     const exercisePosition = position || thisWorkout.exercises.length + 1
 
     const newExercise = {
-      api_exercise_id,
+      exerciseId,
       name: name || exerciseExists.data.name,
       sets: sets || [],
       notes: notes || '',

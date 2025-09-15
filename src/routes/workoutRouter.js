@@ -59,7 +59,7 @@ const updateMusclesEquip = async (workout) => {
 
     target_muscles.forEach(muscle => {
       if(!exerciseSameTargetMuscle(muscle)) {
-        workout.muscle_groups.push({secondary_muscle: muscle})
+        workout.muscle_groups.push({muscle: muscle})
       }
     })
 

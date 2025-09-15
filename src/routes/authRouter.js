@@ -128,6 +128,4 @@ router.post("/login", async (request, response) => {
   }
 })
 
-// Log out
-
 module.exports = router

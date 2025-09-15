@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const workoutSchema = mongoose.Schema({
   exercises: [{
-    api_exercise_id: String,
+    exerciseId: String,
     name: String,
     order: Number,
     sets: [

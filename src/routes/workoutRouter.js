@@ -21,22 +21,26 @@ const updateMusclesEquip = async (workout) => {
 
     // logger.info(exerciseExists)
 
-    const target = exerciseExists.data.target
-    const equipment = exerciseExists.data.equipment
-    const secondary_muscle = exerciseExists.data.secondaryMuscles
+    const target_muscles = exerciseExists.data.targetMuscles
+    const equipment = exerciseExists.data.equipments
+    const secondary_muscles = exerciseExists.data.secondaryMuscles
 
 
-    const exerciseSameEquipment = workout.equipment_needed.find(object => {
-      if (object) {
-        return object.equipment === equipment
-      }
-    })
+    const exerciseSameEquipment = (thisEquip) => {
+      return workout.equipment.find(object => {
+        if (object) {
+          return object.equipment = thisEquip
+        }
+      })
+    }
 
-    const exerciseSameTarget = workout.muscle_groups.find(object => {
-      if (object) {
-        return object.muscle === target
-      }
-    })
+    const exerciseSameTargetMuscle = (thisTargetMuscle) => {
+      return workout.muscle_groups.find(object => {
+        if (object) {
+          return object.muscle === thisTargetMuscle
+        }
+      })
+    }
 
     const exerciseSameSecondaryMuscle = (thisSecMuscle) => {
       // takes a sec muscle from list of sec muscles and checks if its already in the list
@@ -47,16 +51,19 @@ const updateMusclesEquip = async (workout) => {
       })
     }
 
-    if (!exerciseSameEquipment) {
-      workout.equipment_needed.push({equipment: equipment})
-      logger.info(workout.equipment_needed + equipment)
-    }
+    equipment.forEach(equip => {
+      if (!exerciseSameEquipment(equip)) {
+        workout.equipment.push({equipment: equip})
+      }
+    })
 
-    if (!exerciseSameTarget) {
-      workout.muscle_groups.push({muscle: target})
-    }
+    target_muscles.forEach(muscle => {
+      if(!exerciseSameTargetMuscle(muscle)) {
+        workout.muscle_groups.push({secondary_muscle: muscle})
+      }
+    })
 
-    secondary_muscle.forEach(muscle => {
+    secondary_muscles.forEach(muscle => {
       if(!exerciseSameSecondaryMuscle(muscle)) {
         workout.secondary_muscle_groups.push({secondary_muscle: muscle})
       }

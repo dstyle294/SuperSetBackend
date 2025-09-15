@@ -27,7 +27,7 @@ const updateMusclesEquip = async (workout) => {
 
 
     const exerciseSameEquipment = (thisEquip) => {
-      return workout.equipment.find(object => {
+      return workout.equipment_needed.find(object => {
         if (object) {
           return object.equipment = thisEquip
         }

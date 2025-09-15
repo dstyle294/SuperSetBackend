@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const job = require('./lib/cron')
 
 const authRouter = require('./routes/authRouter')
 const workoutRouter = require('./routes/workoutRouter')
@@ -15,12 +16,14 @@ const connectDB = require('./lib/db')
 
 const app = express()
 
-
+job.start()
 
 mongoose.set('strictQuery', false)
 logger.info(`connecting to ${config.MONGODB_URI}`)
 
 connectDB()
+
+
 
 app.use(cors())
 app.use(express.json())

@@ -9,7 +9,7 @@ router.get("/", async (request, response) => {
   try {
     const page = parseInt(request.query.page) || 1
     const limit = parseInt(request.query.limit) || 10
-    const skip = page - 1 * limit
+    const skip = (page - 1) * limit
 
     const exercises = await exerciseService.getAllExercises(page, limit, skip)
     response.status(200).json({

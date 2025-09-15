@@ -16,14 +16,15 @@ async function getAllExercises(pageNum, limit, skip) {
   return {
     status: 200,
     data: slicedExercises,
-    page: pageNum,
+    pageNum,
     count: slicedExercises.length,
     totalExercises: allExercises.length,
-    totalPages: totalPages,
+    totalPages,
     totalExercises: allExercises.length,
     message: 'Success',
   }
 }
+
 
 async function getExerciseById(id) {
   try {

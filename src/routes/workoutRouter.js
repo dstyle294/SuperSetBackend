@@ -625,10 +625,59 @@ router.patch("/:workoutId/exercises/:exerciseId/sets/:setId", middleware.protect
     const workoutId = new mongoose.Types.ObjectId(request.params.workoutId)
     const userId = request.user._id.toString()
     const exerciseId = request.params.exerciseId.toString() // this is not api exercise id but the exercise instance id
+    const setId = request.params.setId.toString()
 
     const updateData = request.body
+
+    const thisWorkout = await Workout.findOne({
+      $and: [
+        {_id: {$eq: workoutId}},
+        {user: {$eq: userId}}
+      ]
+    })
+
+    if (!thisWorkout) {
+      return response.status(404).json({ message: "Workout not found" })
+    }
+
+    const exerciseIndex = thisWorkout.exercises.findIndex(
+      exercise => exercise._id.toString() === exerciseId
+    )
+
+    if (exerciseIndex === -1) {
+      return response.status(404).json({ message: "Exercise not found in workout"})
+    }
+
+    const setIndex = thisWorkout.exercises[exerciseIndex].sets.findIndex(
+      set => set._id.toString() === setId
+    )
+
+    if (setIndex === -1) {
+      return response.status(404).json({ message: "Set not found in workout" })
+    }
+
+    const allowedFields = ['reps', 'weight', 'completed', 'notes']
+    allowedFields.forEach(field => {
+      if (updateData[field] != undefined) {
+        thisWorkout.exercises[exerciseIndex].sets[setIndex][field] = updateData[field]
+      }
+    })
+
+    thisWorkout.exercises[exerciseIndex].updated_at = new Date()
+    thisWorkout.updated_at = new Date()
+
+    await thisWorkout.save()
+
+    response.status(200).json({
+      message: 'Set updated',
+      exercise: thisWorkout.exercises[exerciseIndex],
+      workout: thisWorkout,
+    })
+
+
   } catch (error) {
-    
+    logger.error(`Error updating set ${error}`)
+    response.status(500).json({ message: 'Failed to update set' })
   }
 })
 
@@ -716,8 +765,14 @@ router.delete("/:workoutId/exercises/:exerciseId/sets/:setId", middleware.protec
       return response.status(404).json({ message: "Set not found in workout" })
     }
 
-    
+    thisWorkout.exercises[exerciseIndex].sets.splice(setIndex, 1)
 
+    thisWorkout.exercises[exerciseIndex].sets.map((set, index) => {
+      if (index >= setIndex) {
+        set.set_number -= 1
+        return set
+      }
+    })
 
     thisWorkout.exercises[exerciseIndex].updated_at = new Date()
     thisWorkout.updated_at = new Date()

@@ -64,6 +64,7 @@ router.post("/register", async (request, response) => {
       name,
       passwordHash,
       profileImage,
+      createdAt: Date.now(),
     })
 
     const savedUser = await user.save()

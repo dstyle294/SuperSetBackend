@@ -58,12 +58,15 @@ router.post("/register", async (request, response) => {
     // get a random avatar
     const profileImage = `https:api.dicebear.com/7.x/avataars/svg?seed=${username}`
 
+    const uploadResponse = await cloudinary.uploader.upload(updateData['profileImage'])
+    const imageUrl = uploadResponse.secure_url
+
     const user = new User({
       username,
       email,
       name,
       passwordHash,
-      profileImage,
+      imageUrl,
       createdAt: Date.now(),
     })
 
